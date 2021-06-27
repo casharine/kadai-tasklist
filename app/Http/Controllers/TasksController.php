@@ -34,8 +34,8 @@ class TasksController extends Controller
     public function create()
     {
         $task = new Task;
-        
-        //タスク作成ビューを表示
+
+        // メッセージ作成ビューを表示
         return view('tasks.create', [
             'task' => $task,
         ]);
@@ -48,15 +48,22 @@ class TasksController extends Controller
      * @return \Illuminate\Http\Response
      */
     // postでmessages/にアクセスされた場合の「新規登録処理」
-    public function store(Request $request)
+     public function store(Request $request)
     {
-        //タスクを作成
-        $task = new task;
+        // バリデーション
+        $request->validate([
+            'status' => 'required|max:10',   // 追加
+            'content' => 'required|max:255',
+        ]);
+
+        // メッセージを作成
+        $task = new Task;
+        $task->status = $request->status;    // 追加
         $task->content = $request->content;
-        $message->save();
-        
+        $task->save();
+
         // トップページへリダイレクトさせる
-        return redirecrt('/');
+        return redirect('/');
     }
 
     /**
@@ -106,9 +113,15 @@ class TasksController extends Controller
 
     public function update(Request $request, $id)
     {
+         // バリデーション
+        $request->validate([
+            'status' => 'required|max:10',   // 追加
+            'content' => 'required|max:255',
+        ]);
         //// idの値でタスクを検索して取得
         $task = Task::findOrFail($id);
         //　タスク更新
+        $task->status = $request->status;
         $task->content = $request->content;
         $task->save();
 

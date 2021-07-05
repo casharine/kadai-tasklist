@@ -23,6 +23,12 @@
                          {{-- メッセージ作成ページへのリンク --}}
                         <li class="nav-item">{!! link_to_route('tasks.create', '新規タスクの作成', [], ['class' => 'nav-link']) !!}</li>
                     </ul>
+                    <ul class="navbar-nav">
+                        {{-- ユーザ登録ページへのリンク --}}
+                        <li>{!! link_to_route('signup.get', 'Signup', [], ['class' => 'nav-link']) !!}</li>
+                        {{-- ログインページへのリンク --}}
+                        <li><a href="#">Login</a></li>
+                    </ul>
                 </div>
                 
             </nav>

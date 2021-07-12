@@ -13,13 +13,14 @@
 //　認証付きルーティング
 Route::group(['middleware' => ['auth']], function () {
     Route::resource('users', 'UsersController', ['only' => ['index', 'show','create','store','edit','update','destroy']]);
+    Route::resource('tasks', 'TasksController', ['only' => ['store', 'destroy']]);
 });
 
 // デフォルトページの表示
 Route::get('/', 'TasksController@index');
 Route::resource('tasks', 'TasksController');
 
-// デフォルトページの表示
+// ユーザー登録
 Route::get('signup', 'Auth\RegisterController@showRegistrationForm')->name('signup.get');
 Route::post('signup', 'Auth\RegisterController@register')->name('signup.post');
 

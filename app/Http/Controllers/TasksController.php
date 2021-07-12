@@ -14,15 +14,23 @@ class TasksController extends Controller
      * @return \Illuminate\Http\Response
      */
     // getでmessages/にアクセスされた場合の「一覧表示処理」
-    public function index()
+        public function index()
     {
-        //タスク一覧を取得
-        $tasks = Task::all();
+        $data = [];
+        if (\Auth::check()) { // 認証済みの場合
+            // 認証済みユーザを取得
+            $user = \Auth::user();
+             //タスク一覧を取得
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
+            $data = [
+                'user' => $user,
+                'tasks' => $tasks,
+            ];
+            return view('tasks.index',$data);
+        }
         
-        // タスク一覧ビューでそれを表示
-        return view('tasks.index',[
-            'tasks' => $tasks,
-        ]);
+        //サインアップ前ユーザーはウェルカムページへ
+        return view('welcome',$data);
     }
 
     /**
@@ -56,11 +64,11 @@ class TasksController extends Controller
             'content' => 'required|max:255',
         ]);
 
-        // メッセージを作成
-        $task = new Task;
-        $task->status = $request->status;    // 追加
-        $task->content = $request->content;
-        $task->save();
+        // 認証済みユーザーとして作成
+        $request->user()->tasks()->create([
+        'status' => $request->status,    // 追加
+        'content' => $request->content,
+        ]);
 
         // トップページへリダイレクトさせる
         return redirect('/');
@@ -75,13 +83,28 @@ class TasksController extends Controller
     // getでmessages/（任意のid）にアクセスされた場合の「取得表示処理」
     public function show($id)
     {
+        
+         if (\Auth::check()) { // 認証済みの場合
+            // 認証済みユーザを取得
+            $user = \Auth::user();
+         }
+            
         // idの値でメッセージを検索して取得
         $task = Task::findOrFail($id);
+       
+       // ユーザの投稿一覧を作成日時の降順で取得
+        $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
+
+        // ユーザ詳細ビューでそれらを表示
+        return view('tasks.show', [
+            'user' => $user,
+            'task' => $task,
+        ]);
         
         // タスク詳細ビューでそれを表示
-        return view('tasks.show',[
-            'task' => $task
-        ]);
+      //  return view('tasks.show',[
+    //        'task' => $task
+     //   ]);
     }
 
     /**
@@ -140,9 +163,11 @@ class TasksController extends Controller
     public function destroy($id)
     {
         // idの値でタスクを検索して取得
-        $task = Task::findOrFail($id);
+        $task = \App\Task::findOrFail($id);
         //　タスク削除
-        $task->delete();
+         if (\Auth::id() === $task->user_id) {
+            $task->delete();
+         }
 
         // トップページへリダイレクトさせる
         return redirect('/');

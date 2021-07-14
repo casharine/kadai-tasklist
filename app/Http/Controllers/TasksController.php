@@ -82,21 +82,21 @@ class TasksController extends Controller
      */
     // getでmessages/（任意のid）にアクセスされた場合の「取得表示処理」
     public function show($id)
-    {
-         if (\Auth::check()) { // 認証済みの場合
-            // 認証済みユーザを取得
-            $user = \Auth::user();
-            
-        // idの値でメッセージを検索して取得
+    {   
+        // タスクidの取得
         $task = Task::findOrFail($id);
-    
-        // ユーザ詳細ビューでそれらを表示
-        return view('tasks.show', [
-            'user' => $user,
-            'task' => $task,
+       
+       //　タスクidの所有者か　真：ユーザーは認証済みユーザー
+        if (\Auth::id() === $task->user_id) {
+             $user = \Auth::user();
+            
+            // タスク詳細ビューでそれらを表示
+            return view('tasks.show', [
+                'user' => $user,
+                'task' => $task,
         ]);
         }
-        //未認証の場合　ウェルカムページへ
+        //else リダイレクト
         return redirect('/');
     }
 
@@ -108,19 +108,20 @@ class TasksController extends Controller
      */
      // getでmessages/（任意のid）/editにアクセスされた場合の「更新画面表示処理」
     public function edit($id)
-    {
-         if (\Auth::check()) { // 認証済みの場合
-            // 認証済みユーザを取得
-            $user = \Auth::user();
-        //idの値でタスクを検索して取得
+    {   
+        // タスクidの取得
         $task = Task::findOrFail($id);
+       
+       //　タスクidの所有者か　真：ユーザーは認証済みユーザー
+        if (\Auth::id() === $task->user_id) {
+             $user = \Auth::user();
+            
 
-        // メッセージ編集ビューでそれを表示
+        // タスク編集ビューでそれを表示
         return view('tasks.edit', [
             'task' => $task,
         ]);
         }
-        //未認証の場合　ウェルカムページへ
         return redirect('/');
     }
 
@@ -134,18 +135,20 @@ class TasksController extends Controller
     // putまたはpatchでmessages/（任意のid）にアクセスされた場合の「更新処理」
 
     public function update(Request $request, $id)
-    {
-         if (\Auth::check()) { // 認証済みの場合
-            // 認証済みユーザを取得
-            $user = \Auth::user();
+    {   
+        // タスクidの取得
+        $task = Task::findOrFail($id);
+       
+       //　タスクidの所有者か　真：ユーザーは認証済みユーザー
+        if (\Auth::id() === $task->user_id) {
+             $user = \Auth::user();
             
          // バリデーション
         $request->validate([
             'status' => 'required|max:10',   // 追加
             'content' => 'required|max:255',
         ]);
-        //// idの値でタスクを検索して取得
-        $task = Task::findOrFail($id);
+        
         //　タスク更新
         $task->status = $request->status;
         $task->content = $request->content;
@@ -165,14 +168,15 @@ class TasksController extends Controller
      // deleteでmessages/（任意のid）にアクセスされた場合の「削除処理」
     public function destroy($id)
     {   
-         if (\Auth::check()) { // 認証済みの場合
-            // 認証済みユーザを取得
-            $user = \Auth::user();
-            
-        // idの値でタスクを検索して取得
-        $task = \App\Task::findOrFail($id);
+        // タスクidの取得
+        $task = Task::findOrFail($id);
+       
+       //　タスクidの所有者か　真：ユーザーは認証済みユーザー
+        if (\Auth::id() === $task->user_id) {
+             $user = \Auth::user();
+             
         //　タスク削除
-         if (\Auth::id() === $task->user_id) {
+        if (\Auth::id() === $task->user_id) {
             $task->delete();
          }
          }

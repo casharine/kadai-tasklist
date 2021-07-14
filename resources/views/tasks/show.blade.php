@@ -2,8 +2,6 @@
 
 @section('content')
 
-<!-- タスクidユーザーとログインユーザーが同一の場合のみ表示する -->
-@if ($task->user == $user ) 
 
 <!-- ここにページ毎のコンテンツを書く -->
  <h1>id = {{ $task->id }} のタスク詳細ページ</h1>
@@ -27,5 +25,4 @@
         {!! Form::submit('削除', ['class' => 'btn btn-danger']) !!}
     {!! Form::close() !!}
     
-    @endif
 @endsection

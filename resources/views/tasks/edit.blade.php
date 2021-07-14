@@ -2,6 +2,9 @@
 
 @section('content')
 
+<!-- タスクidユーザーとログインユーザーが同一の場合のみ表示する -->
+@if ($task->user == $user ) 
+
     <h1>id: {{ $task->id }} のタスク編集ページ</h1>
 
     <div class="row">
@@ -24,5 +27,5 @@
             {!! Form::close() !!}
         </div>
     </div>
-
+    @endif
 @endsection

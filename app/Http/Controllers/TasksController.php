@@ -83,28 +83,21 @@ class TasksController extends Controller
     // getでmessages/（任意のid）にアクセスされた場合の「取得表示処理」
     public function show($id)
     {
-        
          if (\Auth::check()) { // 認証済みの場合
             // 認証済みユーザを取得
             $user = \Auth::user();
-         }
             
         // idの値でメッセージを検索して取得
         $task = Task::findOrFail($id);
-       
-       // ユーザの投稿一覧を作成日時の降順で取得
-        $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
-
+    
         // ユーザ詳細ビューでそれらを表示
         return view('tasks.show', [
             'user' => $user,
             'task' => $task,
         ]);
-        
-        // タスク詳細ビューでそれを表示
-      //  return view('tasks.show',[
-    //        'task' => $task
-     //   ]);
+        }
+        //未認証の場合　ウェルカムページへ
+        return redirect('/');
     }
 
     /**
@@ -116,6 +109,9 @@ class TasksController extends Controller
      // getでmessages/（任意のid）/editにアクセスされた場合の「更新画面表示処理」
     public function edit($id)
     {
+         if (\Auth::check()) { // 認証済みの場合
+            // 認証済みユーザを取得
+            $user = \Auth::user();
         //idの値でタスクを検索して取得
         $task = Task::findOrFail($id);
 
@@ -123,6 +119,9 @@ class TasksController extends Controller
         return view('tasks.edit', [
             'task' => $task,
         ]);
+        }
+        //未認証の場合　ウェルカムページへ
+        return redirect('/');
     }
 
     /**
@@ -136,6 +135,10 @@ class TasksController extends Controller
 
     public function update(Request $request, $id)
     {
+         if (\Auth::check()) { // 認証済みの場合
+            // 認証済みユーザを取得
+            $user = \Auth::user();
+            
          // バリデーション
         $request->validate([
             'status' => 'required|max:10',   // 追加
@@ -147,7 +150,7 @@ class TasksController extends Controller
         $task->status = $request->status;
         $task->content = $request->content;
         $task->save();
-
+    }
         // トップページへリダイレクトさせる
         return redirect('/');
     }
@@ -161,14 +164,18 @@ class TasksController extends Controller
      */
      // deleteでmessages/（任意のid）にアクセスされた場合の「削除処理」
     public function destroy($id)
-    {
+    {   
+         if (\Auth::check()) { // 認証済みの場合
+            // 認証済みユーザを取得
+            $user = \Auth::user();
+            
         // idの値でタスクを検索して取得
         $task = \App\Task::findOrFail($id);
         //　タスク削除
          if (\Auth::id() === $task->user_id) {
             $task->delete();
          }
-
+         }
         // トップページへリダイレクトさせる
         return redirect('/');
     }
